@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: k8s-guestbook
+  namespace: argocd   # Argo CD namespace (default in OpenShift GitOps)
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/vivekanandar2001/ArgoCD.git
+    targetRevision: main
+    path: nginx   # Path inside the repo containing Kubernetes manifests
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: guestbook   # Target namespace where app will be deployed
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true    # Ensures Argo CD uses OpenShift’s SCC policies correctly
+      - ApplyOutOfSyncOnly=true
+      - RespectIgnoreDifferences=true
